@@ -2,7 +2,7 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize('nodeAuth','root','');
 
 var User = sequelize.define('user', {
-    username: Sequelize.STRING,
+    username: { type: Sequelize.STRING, unique: true },
 });
 
 //TODO
