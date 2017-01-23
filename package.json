@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/dallinn/node-auth/issues"
   },
-  "homepage": "https://github.com/dallinn/node-auth#readme"
+  "homepage": "https://github.com/dallinn/node-auth#readme",
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "express": "^4.14.0",
+    "sequelize": "^3.29.0"
+  }
 }
