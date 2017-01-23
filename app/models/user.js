@@ -5,6 +5,7 @@ var User = sequelize.define('user', {
     username: Sequelize.STRING,
 });
 
+//TODO
 sequelize.sync();
 
 module.exports = User;

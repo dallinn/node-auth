@@ -3,17 +3,8 @@ var app = express();
 var bodyParser = require('body-parser');
 var router = express.Router();
 
-var Sequelize = require('sequelize');
-var sequelize = new Sequelize('nodeAuth','root','');
-
-var User = sequelize.define('user', {
-    username: Sequelize.STRING,
-});
-
-sequelize.sync();
-
 //models
-//var User = require('./app/models/user');
+var User = require('./app/models/user');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
