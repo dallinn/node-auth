@@ -25,7 +25,15 @@ router.route('/users')
         if (errors.length > 0) {
             return res.json({ errors });
         }
+        
+        console.log('password before hash: ' + password);
 
+        //password hashing
+        bcrypt.hash(password, 10, function(err, hash) {
+             console.log(hash); 
+        });
+
+        process.exit();
         User.create({
             username: req.body.username,
         }).then(function(user){
