@@ -17,12 +17,14 @@ router.route('/users')
         console.log(req.body);
 
         var username = req.body.username;
+        var password = req.body.password;
 
-        console.log(username);
-        
-        if (!username) return res.json({ error: 'please provide a username' });
-        else if (username.indexOf(' ') >= 0) return res.json({ error: 'username cannot contain spaces' });
-        else if (!/^[a-z0-9+$]/i.test(username)) return res.json({ error: 'username can only contain letters and numbers' });
+        var error = sanitize(username, 'username', res);
+        var errors = error.concat(sanitize(password, 'password', res));
+
+        if (errors.length > 0) {
+            return res.json({ errors });
+        }
 
         User.create({
             username: req.body.username,
@@ -74,3 +76,13 @@ router.route('/users/:user_id')
 //end /users/:user_id
 
 app.listen(3000);
+
+function sanitize(param, name, res) {
+    var error = [];
+    if (!param) error.push(name + ' cannot be empty');
+    if (param.indexOf(' ') >= 0) error.push(name + ' cannot contain spaces');
+    if (name != 'password') {
+        if (!/^[a-z0-9]+$/i.test(param)) error.push(name + ' can only contain letters and numbers');
+    }
+    return error;
+};
