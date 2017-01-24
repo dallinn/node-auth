@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/dallinn/node-auth#readme",
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "body-parser": "^1.16.0",
     "express": "^4.14.0",
     "mysql": "^2.12.0",
