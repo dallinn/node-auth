@@ -3,13 +3,16 @@ var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
 var User = require('../models/user');
 var Common = require('../common');
+//TODO env 'secret' key for jwt
+//TODO add to Common.sanitize to get rid of repeated code, DRY...
+var secret = 'temp'
 
 router.route('/auth')
     /*
      * Authentication router
-     * POST creates new jwt
+     * POST creates new jwt (login)
      * PUT checks jwt
-     * DELETE destroys jwt
+     * DELETE destroys jwt (logout)
     */ 
     .post(function(req,res) {
         var username = req.body.username;
@@ -29,8 +32,8 @@ router.route('/auth')
         User.findOne({ where: {username: username} })
         .then(function(user) {
             if (bcrypt.compareSync(password, user.password)) {
-                //TODO env secret key
-                var token = jwt.sign({ username: user.username }, 'temp', { expiresIn: '8h' });
+                var token = jwt.sign({ username: user.username }, secret, { expiresIn: '8h' });
+                user.update({ token: token });
                 res.send({ token });
             } else {
                 res.send({ error: 'incorrect password' });
@@ -41,11 +44,55 @@ router.route('/auth')
     })
     .put(function(req,res) {
         var token = req.body.token;
-        //TODO env secret key
-        var decoded = jwt.verify(token, 'temp');
-        res.send({ decoded });
+        var username = req.body.username; 
+
+        if (!username || !token) {
+            return res.json({ error: 'You must provide a username and token to check authentication' });
+        }
+
+        var errors = Common.sanitize(username, 'username', res);
+
+        if (errors.length > 0) {
+            return res.json({ errors });
+        }
+
+        User.findOne({ where: { username: username }})
+        .then(function(user) {
+            if (token == user.token) {
+                return res.send({ status: 200 });
+            } else {
+                return res.send({ status: 'error, please log in again' });
+            }
+        }).catch(function(err) {
+            res.json({ error: err });
+        });
     })
     .delete(function(req,res) {
+        var token = req.body.token;
+        var username = req.body.username; 
+
+        if (!username || !token) {
+            return res.json({ error: 'You must provide a username and token to delete authentication' });
+        }
+
+        var errors = Common.sanitize(username, 'username', res);
+
+        if (errors.length > 0) {
+            return res.json({ errors });
+        }
+
+        User.findOne({ where: { username: username }})
+        .then(function(user) {
+            if (token == user.token) {
+                user.update({ token: null });
+                return res.send({ status: 200 });
+            } else {
+                return res.send({ status: 'error, please log in again' });
+            }
+               // var decoded = jwt.verify(token, secret);
+        }).catch(function(err) {
+            res.json({ error: err });
+        });
     });
 
 module.exports = router;
