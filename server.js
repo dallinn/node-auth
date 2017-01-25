@@ -7,10 +7,15 @@ app.use(bodyParser.json());
 //TODO env 'secret' key for jwt
 secret = 'temp';
 
+//temp
+//TODO import common, checkToken, next
+var auth = function(req, res, next) { next(); };
+
 // Routes
+var AuthAPI = require('./app/routes/auth');
 var Users = require('./app/routes/users');
-var Auth = require('./app/routes/auth');
-app.use('/api', Users, Auth);
+
+app.use('/api', auth, [Users,AuthAPI]);
 
 app.get('/test', function(req,res) {
     return res.json({ status: 'yo' });
