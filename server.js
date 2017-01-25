@@ -41,7 +41,6 @@ router.route('/users')
             });
         }).catch(function(err) {
             res.json({
-                //username not unique error message
                 error: err.errors[0].message
             });
         });
@@ -79,9 +78,40 @@ router.route('/users/:user_id')
         }).catch(function(err) {
             res.json({ err }); 
         });
-        
     });
 //end /users/:user_id
+
+router.route('/auth')
+    .post(function(req,res) {
+        var username = req.body.username;
+        var password = req.body.password;
+
+        if (!username || !password) {
+            return res.json({ error: 'You must provide a username and password for account creation' });
+        }
+
+        var error = sanitize(username, 'username', res);
+        var errors = error.concat(sanitize(password, 'password', res));
+
+        if (errors.length > 0) {
+            return res.json({ errors });
+        }
+
+        User.findOne({ where: {username: username} })
+        .then(function(user) {
+            if (bcrypt.compareSync(password, user.password)) {
+                res.send({ user: user.id });
+            } else {
+                res.send({ error: 'incorrect password' });
+            }
+        }).catch(function(err) {
+            res.json({ error: err }); 
+        });
+    })
+    .delete(function(req,res) {
+        res.send({ msg: 'user logged out' });
+    });
+//end /auth
 
 app.listen(3000);
 
