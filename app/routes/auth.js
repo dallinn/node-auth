@@ -3,9 +3,6 @@ var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
 var User = require('../models/user');
 var Common = require('../common');
-//TODO env 'secret' key for jwt
-//TODO add to Common.sanitize to get rid of repeated code, DRY...
-var secret = 'temp'
 
 router.route('/auth')
     /*
@@ -36,35 +33,20 @@ router.route('/auth')
     })
     .put(function(req,res) {
         var token = req.body.token;
-        var username = req.body.username; 
 
-        var errors = Common.sanitize([username, token],['username','token']);
+        var errors = Common.sanitize(token, 'token');
         if (errors.length > 0) return res.json({ errors });
 
-        User.findOne({ where: { username: username }})
-        .then(function(user) {
-            if (token == user.token) {
-                return res.send({ status: 200 });
-            } else {
-                return res.send({ status: 'error, please log in again' });
-            }
-        }).catch(function(err) {
-            res.json({ error: err });
-        });
+        if(Common.checkToken(token, User, jwt, res)) {
+            return res.json({ status: 200 });
+        }
     })
     .delete(function(req,res) {
         var token = req.body.token;
         var username = req.body.username; 
 
-        if (!username || !token) {
-            return res.json({ error: 'You must provide a username and token to delete authentication' });
-        }
-
-        var errors = Common.sanitize(username, 'username', res);
-
-        if (errors.length > 0) {
-            return res.json({ errors });
-        }
+        var errors = Common.sanitize([username, token],['username','token']);
+        if (errors.length > 0) return res.json({ errors });
 
         User.findOne({ where: { username: username }})
         .then(function(user) {

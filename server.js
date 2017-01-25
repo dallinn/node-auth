@@ -4,6 +4,9 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+//TODO env 'secret' key for jwt
+secret = 'temp';
+
 // Routes
 var Users = require('./app/routes/users');
 var Auth = require('./app/routes/auth');

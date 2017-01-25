@@ -11,7 +11,6 @@ router.route('/users')
         var errors = Common.sanitize([username, password],['username','password']);
         if (errors.length > 0) return res.json({ errors });
 
-        //password hashing
         password = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
         User.create({
@@ -28,7 +27,7 @@ router.route('/users')
         });
     })
     .get(function(req,res) {
-        User.findAll({ attributes: ['id','username'] }).then(function(users) { res.send(users)  }); 
+        User.findAll({ attributes: ['id','username'] }).then(function(users) { res.send(users) }); 
     })
 //end /users
 
