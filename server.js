@@ -14,10 +14,13 @@ app.use('/api', router);
 
 router.route('/users')
     .post(function(req,res) {
-        console.log(req.body);
 
         var username = req.body.username;
         var password = req.body.password;
+
+        if (!username || !password) {
+            return res.json({ error: 'You must provide a username and password for account creation' });
+        }
 
         var error = sanitize(username, 'username', res);
         var errors = error.concat(sanitize(password, 'password', res));
@@ -25,23 +28,20 @@ router.route('/users')
         if (errors.length > 0) {
             return res.json({ errors });
         }
-        
-        console.log('password before hash: ' + password);
 
         //password hashing
-        bcrypt.hash(password, 10, function(err, hash) {
-             console.log(hash); 
-        });
+        password = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
-        process.exit();
         User.create({
-            username: req.body.username,
+            username: username,
+            password: password
         }).then(function(user){
             res.json({
                 status: "User Created"
             });
         }).catch(function(err) {
             res.json({
+                //username not unique error message
                 error: err.errors[0].message
             });
         });
