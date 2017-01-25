@@ -3,6 +3,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var router = express.Router();
 var bcrypt = require('bcrypt');
+var jwt = require('jsonwebtoken');
 
 //models
 var User = require('./app/models/user');
@@ -82,12 +83,18 @@ router.route('/users/:user_id')
 //end /users/:user_id
 
 router.route('/auth')
+    /*
+     * Authentication router
+     * POST creates new jwt
+     * PUT checks jwt
+     * DELETE destroys jwt
+    */ 
     .post(function(req,res) {
         var username = req.body.username;
         var password = req.body.password;
 
         if (!username || !password) {
-            return res.json({ error: 'You must provide a username and password for account creation' });
+            return res.json({ error: 'You must provide a username and password for authentication' });
         }
 
         var error = sanitize(username, 'username', res);
@@ -100,7 +107,9 @@ router.route('/auth')
         User.findOne({ where: {username: username} })
         .then(function(user) {
             if (bcrypt.compareSync(password, user.password)) {
-                res.send({ user: user.id });
+                //TODO env secret key
+                var token = jwt.sign({ username: user.username }, 'temp', { expiresIn: '8h' });
+                res.send({ token });
             } else {
                 res.send({ error: 'incorrect password' });
             }
@@ -108,8 +117,13 @@ router.route('/auth')
             res.json({ error: err }); 
         });
     })
+    .put(function(req,res) {
+        var token = req.body.token;
+        //TODO env secret key
+        var decoded = jwt.verify(token, 'temp');
+        res.send({ decoded });
+    })
     .delete(function(req,res) {
-        res.send({ msg: 'user logged out' });
     });
 //end /auth
 
