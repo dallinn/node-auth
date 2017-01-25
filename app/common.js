@@ -1,12 +1,19 @@
 class Common {
-    sanitize(param, name, res) {
-        var error = [];
-        if (!param) error.push(name + ' cannot be empty');
-        if (param.indexOf(' ') >= 0) error.push(name + ' cannot contain spaces');
-        if (name != 'password') {
-            if (!/^[a-z0-9]+$/i.test(param)) error.push(name + ' can only contain letters and numbers');
+    sanitize(params, names) {
+        //there has got to be a way to get parameter names better than having to pass in a string
+        var errors = [];
+        for (var i = 0; i < params.length; i++) {
+            console.log(params[i]);
+            if (!params[i]) {
+                errors.push(names[i] + ' cannot be empty');
+                return errors;
+            }
+            if (params[i].indexOf(' ') >= 0) errors.push(names[i] + ' cannot contain spaces');
+            if (!names[i] == 'password' || !names[i] == 'token') {
+                if (!/^[a-z0-9]+$/i.test(params[i])) errors.push(names[i] + ' can only contain letters and numbers');
+            }
         }
-        return error;
+        return errors;
     }
 }
 

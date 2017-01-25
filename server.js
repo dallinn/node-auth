@@ -9,4 +9,8 @@ var Users = require('./app/routes/users');
 var Auth = require('./app/routes/auth');
 app.use('/api', Users, Auth);
 
+app.get('/test', function(req,res) {
+    return res.json({ status: 'yo' });
+});
+
 app.listen(3000);

@@ -5,20 +5,11 @@ var Common = require('../common');
 
 router.route('/users')
     .post(function(req,res) {
-
         var username = req.body.username;
         var password = req.body.password;
 
-        if (!username || !password) {
-            return res.json({ error: 'You must provide a username and password for account creation' });
-        }
-
-        var error = Common.sanitize(username, 'username', res);
-        var errors = error.concat(Common.sanitize(password, 'password', res));
-
-        if (errors.length > 0) {
-            return res.json({ errors });
-        }
+        var errors = Common.sanitize([username, password],['username','password']);
+        if (errors.length > 0) return res.json({ errors });
 
         //password hashing
         password = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -52,7 +43,7 @@ router.route('/users/:user_id')
     })
     .put(function(req,res) {
         User.update(
-            //TODO sanitize (above)
+            //TODO
             { username: req.body.username },
             { where: { id: req.params.user_id } }
         ).then(function(user) {
@@ -63,6 +54,7 @@ router.route('/users/:user_id')
     })
     .delete(function(req,res){
         User.destroy({
+            //TOOD
             where: { id: req.params.user_id }
         }).then(function(user){
             res.json({ status: "User Deleted" });
