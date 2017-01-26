@@ -1,0 +1,8 @@
+{
+    "ignore": [
+        "client/build"
+    ],
+    "events": {
+        "start": "webpack"
+    }
+}
