@@ -20,7 +20,7 @@ var Users = require('./api/routes/users');
 app.use('/api', auth, [Users,AuthAPI]);
 
 //CLIENT
-app.use('/', express.static('client/build'));
+app.use('/', express.static('client/build/'));
 //app.use(express.static('app/public'));
 
 app.listen(3000);

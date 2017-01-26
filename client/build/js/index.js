@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	document.write("npm start");
+	document.write("npm start here we go");
 
 
 /***/ }
