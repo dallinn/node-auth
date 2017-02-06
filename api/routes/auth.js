@@ -37,26 +37,27 @@ router.route('/auth')
         var errors = Common.sanitize(token, 'token');
         if (errors.length > 0) return res.json({ errors });
 
-        if(Common.checkToken(token, User, jwt, res)) {
-            return res.json({ status: 200 });
-        }
+        Common.checkToken(token, User, jwt, res);
     })
     .delete(function(req,res) {
         var token = req.body.token;
-        var username = req.body.username; 
 
-        var errors = Common.sanitize([username, token],['username','token']);
+        var errors = Common.sanitize(token, 'token');
         if (errors.length > 0) return res.json({ errors });
-
-        User.findOne({ where: { username: username }})
+        
+        try {
+            var decoded = jwt.verify(token, secret);
+        } catch(err) {
+            return res.json({ error: err.message });
+        }
+        User.findOne({ where: { username: decoded.username }})
         .then(function(user) {
             if (token == user.token) {
-                user.update({ token: null });
-                return res.send({ status: 200 });
+                user.update({ token: null })
+                res.json({ status: 200 });
             } else {
-                return res.send({ status: 'error, please log in again' });
+                res.json({ error: 'error, please log in again' });
             }
-               // var decoded = jwt.verify(token, secret);
         }).catch(function(err) {
             res.json({ error: err });
         });

@@ -23,19 +23,18 @@ class Common {
         try {
             var decoded = jwt.verify(token, secret);
         } catch(err) {
-            return res.json(err.message);
+            return res.json({ error: err.message });
         }
         User.findOne({ where: { username: decoded.username }})
         .then(function(user) {
             if (token == user.token) {
-                return true;
+                res.json({ status: 200 });
             } else {
-                return false;
+                res.json({ error: 'inavlid token' });
             }
         }).catch(function(err) {
             res.json({ error: err });
         });
-        return true;
     }
 }
 
